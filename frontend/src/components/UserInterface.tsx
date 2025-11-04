@@ -9,7 +9,7 @@ interface User {
 }
 
 interface UserInterfaceProps {
-    backendName: string; // go
+    backendName: string; // go0000
 }
 
 const UserInterface: React.FC<UserInterfaceProps> = ({ backendName }) => {
@@ -58,6 +58,18 @@ const UserInterface: React.FC<UserInterfaceProps> = ({ backendName }) => {
         }
     }
 
+
+    const  deleteUser = async (id: number) => {
+        try {
+            await axios.delete(`${apiUrl}/api/${backendName}/users/${id}`);
+            // setUsers(users.filter((user) => user.id !== id));
+            await axios.get(`${apiUrl}/api/${backendName}/users`).then((response) => {
+                setUsers(response.data.reverse());
+            });
+        } catch (error) {
+            console.error("Error deleting user:", error);
+        }
+    }
 
 
     return (
