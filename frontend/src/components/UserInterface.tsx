@@ -19,11 +19,11 @@ const UserInterface: React.FC<UserInterfaceProps> = ({ backendName }) => {
     const [updateUser, setUpdateUser] = useState({id: '', name: '', email: ''});
     //Define styles based on the backedn name 
     const backgroundColors : { [key: string]: string } = {
-        go: 'bg-cyan-500'
+        go: 'bg-gray-300'
     }
     
     const buttonColors: { [key: string]: string } = {  
-        go: 'bg-cyan-700 hover:bg-blue-600'
+        go: 'bg-black hover:bg-gray-600 cursonr-pointer'
     }
     
     const bgColor = backgroundColors[backendName as keyof typeof backgroundColors] || 'bg-gray-200';
@@ -71,6 +71,17 @@ const UserInterface: React.FC<UserInterfaceProps> = ({ backendName }) => {
         }
     }
 
+    const updatedUser = async ({id}: {id: number}) => {
+        try {
+            const response = await axios.put(`${apiUrl}/api/${backendName}/users/${id}`, updateUser);
+            axios.get(`${apiUrl}/api/${backendName}/users`).then((response) => {
+                setUsers(response.data.reverse());
+            });
+        } catch (error) {
+            console.error("Error updating user:", error);
+        }
+    }
+
 
     return (
         <div className={`user-interface ${bgColor} ${backendName} w-full max-w-md p-4 my-4 rounded shadow`}>
@@ -79,20 +90,20 @@ const UserInterface: React.FC<UserInterfaceProps> = ({ backendName }) => {
 
         {/* create user  */}
 
-        <form onSubmit={createUser} className="mb-6 p-4 bg-blue-100 rounded shadow text-black">
+        <form onSubmit={createUser} className="mb-6 p-4 bg-gray-400 rounded shadow text-black">
             <input type="text"
                 placeholder="Name"
                 value={newUser.name}
                 onChange={(e) => setNewUser({ ...newUser, name: e.target.value})}
-                className="mb-2 w-full p-2 border border-gray-300 rounded"
+                className="mb-2 w-full p-2 border border-t-black rounded"
             />
             <input type="text"
                 placeholder="Email"
                 value={newUser.email}
                 onChange={(e) => setNewUser({ ...newUser, email: e.target.value})}
-                className="mb-2 w-full p-2 border border-gray-300 rounded"
+                className="mb-2 w-full p-2 border border-t-black rounded"
             />
-            <button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+            <button className="w-full p-2 text-white bg-black rounded hover:bg-gray-600">
                 Add User
             </button>
         </form>
@@ -103,11 +114,16 @@ const UserInterface: React.FC<UserInterfaceProps> = ({ backendName }) => {
            {/* display users  */}
             <div className="space-y-4">
                 {users.map((user) => (
-                    <div key={user.id} className="flex item-center justify-between bg-white p-4 rounded-lg shadow">
+                    <div key={user.id} className="flex item-center justify-between bg-white p-2 rounded-lg shadow">
                         <CardComponent card={user} />
-                        <button onClick={() => deleteUser(user.id)} className={`${btnColor} text-white py-2 px-4 rounded`}>
+                        <div className="flex flex-col gap-2 justify-center mr-4">
+                        <button onClick={() => deleteUser(user.id)} className={`${btnColor} text-white h-8 py-1 text-sm px-2 rounded`}>
                             Delete User
                         </button>
+                        <button onClick={() => updatedUser(user.id)} className={`${btnColor} text-white h-8 text-sm py-1 px-2 rounded`}>
+                            Update User
+                        </button>
+                        </div>
                     </div>
                 ))}
             </div>
