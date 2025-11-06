@@ -102,19 +102,40 @@ const UserInterface: React.FC<UserInterfaceProps> = ({ backendName }) => {
     }
   };
 
-  const updatedUser = async (id: number) => {
+//   const updatedUser = async (id: number) => {
+//     try {
+//       const response = await axios.put(
+//         `${apiUrl}/api/${backendName}/users/${id}`,
+//         updateUser
+//       );
+//       axios.get(`${apiUrl}/api/${backendName}/users`).then((response) => {
+//         setUsers(response.data.reverse());
+//       });
+//     } catch (error) {
+//       console.error("Error updating user:", error);
+//     }
+//   };
+
+  const handleUpdateUser = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
-      const response = await axios.put(
-        `${apiUrl}/api/${backendName}/users/${id}`,
-        updateUser
-      );
-      axios.get(`${apiUrl}/api/${backendName}/users`).then((response) => {
-        setUsers(response.data.reverse());
-      });
+        await axios.put(`${apiUrl}/api/${backendName}/users/${updateUser.id}`, { name: updateUser.name, email: updateUser.email  });
+
+        setUpdateUser({id: "", name: "", email: ""});
+        setUsers(
+            users.map((user) => {
+                if(user.id === parseInt(updateUser.id)) {
+                    return {...user, name: updateUser.name, email: updateUser.email }
+                }
+                return user;
+            })
+        );
     } catch (error) {
-      console.error("Error updating user:", error);
+        console.log("Error updating user: ", error);
     }
-  };
+
+  }
+
 
 
   return (
@@ -177,20 +198,26 @@ const UserInterface: React.FC<UserInterfaceProps> = ({ backendName }) => {
         </button>
       </form>
 
-      {/* <form onSubmit={handleUpdateUser} className="mb-6 p-4 bg-gray-500 rounded shadow text-black">
+      <form onSubmit={handleUpdateUser} className="mb-6 p-4 bg-gray-500 rounded shadow text-black">
         <input type="text" placeholder="User Id"
-        value={updateUser.name}
-        onChange={(e)=> setUpdateUser({...updateUser, email: e.target.value })}
+        value={updateUser.id}
+        onChange={(e)=> setUpdateUser({...updateUser, id: e.target.value })}
         className="mb-2 w-full p-2 border border-black rounded"
         />
-        <input type="text" />
+        <input placeholder="New Name" value={updateUser.name}
+            onChange={(e) => setUpdateUser({ ...updateUser, name: e.target.value})}
+            className="mb-2 w-full p-2 border border-gray-300 rounded"
+        />
 
-        <input type="text" />
+        <input placeholder="New Email" value={updateUser.email}
+            onChange={(e) => setUpdateUser({ ...updateUser, email: e.target.value})}
+            className="mb-2 w-full p-2 border border-gray-300 rounded"
+        />
 
-        <button>
+        <button type="submit" className="w-full p-2 text-white bd-green-500 rounded hover:bg-green-600">
             Update User
         </button>
-      </form> */}
+      </form>
 
       {/* display users  */}
       <div className="space-y-4">
@@ -209,12 +236,12 @@ const UserInterface: React.FC<UserInterfaceProps> = ({ backendName }) => {
               >
                 Delete User
               </button>
-              <button
+              {/* <button
                 onClick={() => updatedUser(user.id)}
                 className={`${btnColor} text-white h-8 text-sm py-1 px-2 rounded`}
               >
                 Update User
-              </button>
+              </button> */}
             </div>
           </div>
         ))}
